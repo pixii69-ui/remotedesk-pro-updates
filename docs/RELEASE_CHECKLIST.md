@@ -12,18 +12,16 @@
 
 ## Pierwsza aktualizacja 0.3.1 → 0.3.2
 
-- [ ] Przygotować 0.3.2+5 i podpisać **tym samym** certyfikatem.
+- [x] Przygotować 0.3.2+5 i podpisać **tym samym** certyfikatem — PASS, workflow kandydata #2.
 - [ ] Przetestować działanie Androida 0.3.2 oraz aktualizację 0.3.1 → 0.3.2
       bez usuwania aplikacji i danych.
 - [ ] Sprawdzić ZIP i uruchamianie Windows na rzeczywistym komputerze.
-- [ ] Uzyskać **osobną, jednoznaczną zgodę właściciela** na publiczną
+- [x] Uzyskać **osobną, jednoznaczną zgodę właściciela** na publiczną
       publikację APK i ZIP.
-- [ ] Opublikować w tym repo GitHub Release `v0.3.2` z
+- [x] Opublikować w tym repo GitHub Release `v0.3.2` z
       `RemoteDeskPRO.apk` oraz `RemoteDeskPRO-Windows.zip`.
-- [ ] Uruchomić ręczny workflow `activate owner-approved OTA (manual)`:
-      numer 0.3.2, kod 5, notatki i potwierdzenie
-      `I_APPROVE_PUBLIC_OTA`.
-- [ ] Zweryfikować PASS oraz dostępność `version.json` w `main`.
+- [x] Aktywować pierwszy publiczny manifest przez PR #2 (właściciel zatwierdził publikację); CI #5 sprawdził rzeczywiste publiczne pliki i ich SHA-256. Ręczny workflow aktywacyjny pozostaje dla kolejnych wydań.
+- [x] Zweryfikować PASS oraz dostępność `version.json` w `main` — CI #5 i #6 PASS.
 - [ ] Na zainstalowanej 0.3.1 sprawdzić wykrycie, pobranie, SHA-256,
       otwarcie instalatora i aktualizację za zgodą użytkownika.
 
