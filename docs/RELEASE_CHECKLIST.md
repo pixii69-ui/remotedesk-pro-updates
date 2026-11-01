@@ -1,42 +1,41 @@
-# RemoteDesk PRO — lista kontrolna pierwszego wydania
+# RemoteDesk PRO — kontrola przed publicznym OTA
 
-## Przed przygotowaniem paczek
+## Gotowe (1 listopada 2026)
 
-- [ ] Kod klienta Android / Windows przeszedł testy Flutter i kontrolę wizualną.
-- [ ] Publiczny kanał `pixii69-ui/remotedesk-pro-updates` jest oddzielony od prywatnego kodu.
-- [ ] Sprawdzono i utrwalono **applicationId Androida** oraz numer `versionCode`; wersja jest wyższa od poprzedniej.
-- [ ] Utworzono **jedyny, trwały klucz podpisu release dedykowany RemoteDesk PRO**.
-- [ ] Kopia zapasowa klucza jest poza GitHubem, bezpieczna i możliwa do odzyskania.
-- [ ] W **prywatnym** repo źródłowym zapisano jeden silny GitHub Secret `ANDROID_SIGNING_PASSPHRASE` (losowy ciąg 32–128 znaków liter/cyfr/_/-), a hasło zachowano również w prywatnym menedżerze haseł.
-- [ ] Z prywatnego workflow `create permanent Android signing key (once)` utworzono certyfikat PKCS#12 RSA 3072 i zaszyfrowany plik `.github/signing/remotedesk-pro-release.p12.gpg`; sprawdzono wynik PASS.
-- [ ] Zaszyfrowany backup klucza jest przechowywany niezależnie od GitHuba; hasła i pliku nie publikować tutaj.
-- [ ] Sprawdzono, czy aktualizacja z tej samej serii podpisów zachowuje dane aplikacji.
-- [ ] Zaplanowano migrację istniejących debug APK. Jeśli podpis jest niezgodny, nie obiecywać aktualizacji bez reinstalacji.
+- [x] Prywatne repo źródłowe i osobne publiczne repo aktualizacji.
+- [x] Wygenerowany **jeden stały certyfikat Android** (bootstrap #3: PASS).
+- [x] Właściciel pobrał zaszyfrowaną kopię zapasową, hasło zachowane osobno.
+- [x] Stałe Android applicationId: `pl.remotedesk.remotedesk_pro`.
+- [x] Podpisane APK 0.3.1+4: apksigner, aapt i kompilacja PASS.
+- [x] Android 0.3.1: instalacja i uruchomienie na telefonie PASS.
+- [x] Publiczny walidator manifestu oraz ręczny workflow aktywacji OTA.
 
-## Budowanie i weryfikacja
+## Pierwsza aktualizacja 0.3.1 → 0.3.2
 
-1. W prywatnym repo uruchomić ręcznie `RemoteDesk PRO — prepare signed candidate (manual)` dla wersji zgodnej z `pubspec.yaml`. Workflow nie publikuje wydania.
-2. Pobrać i zainstalować podpisane APK na rzeczywistym telefonie/tablecie oraz sprawdzić certyfikat podpisu i `versionCode`.
-3. Sprawdzić ZIP Windows: komplet plików aplikacji, uruchomienie programu, skan antywirusowy i instrukcję podmiany.
-4. Po **wyraźnym zatwierdzeniu właściciela** utworzyć **publiczny Release** w tym repozytorium, z tagiem `vX.Y.Z`.
-5. Dodać w Release dwa pliki o dokładnych nazwach: `RemoteDeskPRO.apk` i `RemoteDeskPRO-Windows.zip`.
-6. Wyliczyć SHA-256 plików **faktycznie opublikowanych** i porównać z paczkami testowanymi wcześniej.
+- [ ] Przygotować 0.3.2+5 i podpisać **tym samym** certyfikatem.
+- [ ] Przetestować działanie Androida 0.3.2 oraz aktualizację 0.3.1 → 0.3.2
+      bez usuwania aplikacji i danych.
+- [ ] Sprawdzić ZIP i uruchamianie Windows na rzeczywistym komputerze.
+- [ ] Uzyskać **osobną, jednoznaczną zgodę właściciela** na publiczną
+      publikację APK i ZIP.
+- [ ] Opublikować w tym repo GitHub Release `v0.3.2` z
+      `RemoteDeskPRO.apk` oraz `RemoteDeskPRO-Windows.zip`.
+- [ ] Uruchomić ręczny workflow `activate owner-approved OTA (manual)`:
+      numer 0.3.2, kod 5, notatki i potwierdzenie
+      `I_APPROVE_PUBLIC_OTA`.
+- [ ] Zweryfikować PASS oraz dostępność `version.json` w `main`.
+- [ ] Na zainstalowanej 0.3.1 sprawdzić wykrycie, pobranie, SHA-256,
+      otwarcie instalatora i aktualizację za zgodą użytkownika.
 
-## Aktywacja kanału
+## Mechanizm ochronny
 
-7. Przygotować plik `version.json` na podstawie `docs/version.example.json`, z prawdziwymi numerami, URL i 64-znakowymi SHA-256.
-8. Zweryfikować manifest lokalnie: `python scripts/validate_manifest.py version.json`. Plik musi wskazywać wyłącznie publiczne pliki z tego repo.
-9. Dopiero gdy oba URL działają, ich SHA-256 są prawidłowe, a zgoda na publikację została udzielona, scalić `version.json` do głównej gałęzi `main`.
-10. Sprawdzić odczyt manifestu przez HTTPS oraz wykrycie nowej wersji z zainstalowanej starszej aplikacji.
-11. Na Androidzie systemowy instalator musi poprosić użytkownika o zgodę. Zweryfikować działanie bez utraty danych **na dwóch kolejnych wersjach podpisanych tym samym kluczem**.
-12. Na Windows obecna funkcja to sprawdzenie i pobranie ZIP; wymiana plików jest ręczna. Nie oznaczać jej jako automatycznej aktualizacji Windows.
+- Workflow nie tworzy ani nie zmienia publicznego Release — wymaga
+  jego wcześniejszego zatwierdzenia i opublikowania.
+- Nie dopuszcza APK z obcym certyfikatem, innym package ID ani
+  błędnym numerem wersji.
+- Sprawdza, że nowe `version_code` oraz wersja semantyczna są wyższe
+  od obecnego manifestu. Pierwsza aktywacja wymaga co najmniej 0.3.2+5.
+- Waliduje SHA-256 rzeczywistych, publicznie pobieranych plików.
+- Nie wpisywać haseł, tokenów ani prywatnych kluczy do GitHub Releases.
 
-## Zasady bezpieczeństwa
-
-- Nigdy nie commitować JKS, haseł, tokenów, plików prywatnych ani kodu źródłowego aplikacji.
-- Nie publikować paczek debug jako release; testowy APK z GitHub Actions nie zastępuje podpisanego wydania.
-- Wymagać **stałego certyfikatu podpisu** i wyższego `versionCode` dla kolejnych aktualizacji Androida.
-- Nie publikować `version.json`, gdy pliki Release nie istnieją lub nie są zatwierdzone.
-- SHA-256 względem manifestu sprawdza integralność, ale bez podpisanego/trusted manifestu nie daje silnej gwarancji autentyczności wydawcy; należy zachować bezpieczeństwo konta GitHub i kluczy, a przed wydaniami produkcyjnymi rozważyć podpisanie manifestu.
-
-**Status obecny:** tylko infrastruktura i dokumentacja. Nie ma zatwierdzonego, podpisanego wydania.
+Windows: pobranie ZIP jest automatyzowane; wymiana aplikacji nadal ręczna.
