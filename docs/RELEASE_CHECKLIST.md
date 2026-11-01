@@ -7,7 +7,9 @@
 - [ ] Sprawdzono i utrwalono **applicationId Androida** oraz numer `versionCode`; wersja jest wyższa od poprzedniej.
 - [ ] Utworzono **jedyny, trwały klucz podpisu release dedykowany RemoteDesk PRO**.
 - [ ] Kopia zapasowa klucza jest poza GitHubem, bezpieczna i możliwa do odzyskania.
-- [ ] Sekrety `ANDROID_KEYSTORE_B64`, `ANDROID_STORE_PASSWORD`, `ANDROID_KEY_PASSWORD`, `ANDROID_KEY_ALIAS` ustawiono w **prywatnym** repozytorium źródłowym, nie tutaj.
+- [ ] W **prywatnym** repo źródłowym zapisano jeden silny GitHub Secret `ANDROID_SIGNING_PASSPHRASE` (losowy ciąg 32–128 znaków liter/cyfr/_/-), a hasło zachowano również w prywatnym menedżerze haseł.
+- [ ] Z prywatnego workflow `create permanent Android signing key (once)` utworzono certyfikat PKCS#12 RSA 3072 i zaszyfrowany plik `.github/signing/remotedesk-pro-release.p12.gpg`; sprawdzono wynik PASS.
+- [ ] Zaszyfrowany backup klucza jest przechowywany niezależnie od GitHuba; hasła i pliku nie publikować tutaj.
 - [ ] Sprawdzono, czy aktualizacja z tej samej serii podpisów zachowuje dane aplikacji.
 - [ ] Zaplanowano migrację istniejących debug APK. Jeśli podpis jest niezgodny, nie obiecywać aktualizacji bez reinstalacji.
 
