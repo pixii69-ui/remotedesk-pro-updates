@@ -1,0 +1,107 @@
+name: RemoteDesk PRO — activate owner-approved OTA (manual)
+
+# This workflow NEVER creates a Release. The owner must separately approve
+# publication of the signed Android/Windows files as a public GitHub Release.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Approved public Release tag without v, e.g. 0.3.2'
+        type: string
+        required: true
+      version_code:
+        description: 'Android versionCode, strictly newer than 0.3.1+4'
+        type: string
+        required: true
+      notes:
+        description: 'Polish release notes shown to users (max 2000 characters)'
+        type: string
+        required: true
+        default: 'Aktualizacja RemoteDesk PRO.'
+      approval:
+        description: 'Explicit owner approval to activate public OTA'
+        type: choice
+        required: true
+        options:
+          - 'NO'
+          - 'I_APPROVE_PUBLIC_OTA'
+        default: 'NO'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: remotedesk-approved-public-ota
+  cancel-in-progress: false
+
+jobs:
+  activate:
+    if: github.ref == 'refs/heads/main' && inputs.approval == 'I_APPROVE_PUBLIC_OTA'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      RELEASE_VERSION: ${{ inputs.version }}
+      RELEASE_CODE: ${{ inputs.version_code }}
+      RELEASE_NOTES: ${{ inputs.notes }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify approved release is already published
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release view "v$RELEASE_VERSION" --repo "$GITHUB_REPOSITORY" --json tagName,isDraft,isPrerelease > release-info.json
+          python scripts/check_release_metadata.py release-info.json --version "$RELEASE_VERSION"
+      - name: Download BOTH public Release assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p candidate
+          gh release download "v$RELEASE_VERSION" --repo "$GITHUB_REPOSITORY" \
+            --pattern 'RemoteDeskPRO.apk' --pattern 'RemoteDeskPRO-Windows.zip' --dir candidate
+          test -s candidate/RemoteDeskPRO.apk
+          test -s candidate/RemoteDeskPRO-Windows.zip
+      - name: Verify APK signature, app ID, build and Windows ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          SIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -n 1)
+          AAPT=$(find "$ANDROID_HOME/build-tools" -name aapt -type f | sort -V | tail -n 1)
+          test -n "$SIGNER"
+          test -n "$AAPT"
+          python scripts/verify_public_release_assets.py \
+            --android candidate/RemoteDeskPRO.apk \
+            --windows candidate/RemoteDeskPRO-Windows.zip \
+            --apksigner "$SIGNER" --aapt "$AAPT" \
+            --version "$RELEASE_VERSION" --code "$RELEASE_CODE"
+      - name: Create strictly newer manifest with REAL SHA-256
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/prepare_approved_manifest.py \
+            --android candidate/RemoteDeskPRO.apk \
+            --windows candidate/RemoteDeskPRO-Windows.zip \
+            --version "$RELEASE_VERSION" --code "$RELEASE_CODE" \
+            --notes "$RELEASE_NOTES" --output version.json
+          python scripts/validate_manifest.py version.json --verify-downloads
+      - name: Publish only validated manifest to this public repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Re-check the latest main head before activating a new version.
+          git fetch origin main
+          if [[ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]]; then
+            echo "Main advanced during validation. Retry workflow after checking versions."
+            exit 1
+          fi
+          git add version.json
+          git diff --cached --quiet && { echo "No new manifest; refusing duplicate activation"; exit 1; }
+          git commit -m "release(ota): activate approved RemoteDesk PRO v$RELEASE_VERSION"
+          git push origin HEAD:main
