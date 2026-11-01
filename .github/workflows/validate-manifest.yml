@@ -1,0 +1,39 @@
+name: RemoteDesk PRO — validate public updates
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'version.json'
+      - 'scripts/**'
+      - '.github/workflows/validate-manifest.yml'
+  pull_request:
+    paths:
+      - 'version.json'
+      - 'scripts/**'
+      - '.github/workflows/validate-manifest.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Test manifest and public packages
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test manifest rules (offline)
+        run: python -m unittest discover -s scripts -p 'test_*.py' -v
+      - name: Verify active channel (if published)
+        shell: bash
+        run: |
+          if [[ -f version.json ]]; then
+            python scripts/validate_manifest.py version.json --verify-downloads
+          else
+            echo "INACTIVE: version.json not published; no updates offered."
+          fi
