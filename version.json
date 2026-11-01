@@ -1,17 +1,17 @@
 {
-  "version": "0.3.2",
-  "version_code": 5,
-  "notes": "Aktualizacja RemoteDesk PRO 0.3.2: bezpieczniejsze sprawdzanie i pobieranie aktualizacji. Poprawki obsługi kanału GitHub OTA.",
+  "version": "0.3.4",
+  "version_code": 7,
+  "notes": "Aktualizacja RemoteDesk PRO.",
   "platforms": {
     "android": {
-      "url": "https://github.com/pixii69-ui/remotedesk-pro-updates/releases/download/v0.3.2/RemoteDeskPRO.apk",
+      "url": "https://github.com/pixii69-ui/remotedesk-pro-updates/releases/download/v0.3.4/RemoteDeskPRO.apk",
       "filename": "RemoteDeskPRO.apk",
-      "sha256": "ec457f2c3e21b4bd48ab829645ee4820250c8b33a243ac97f5d28183f2f26da8"
+      "sha256": "3151ff34b463abf4f1cc5520489eb3ec52347d1a0131cbf52bfd20b0ee8d1d22"
     },
     "windows": {
-      "url": "https://github.com/pixii69-ui/remotedesk-pro-updates/releases/download/v0.3.2/RemoteDeskPRO-Windows.zip",
+      "url": "https://github.com/pixii69-ui/remotedesk-pro-updates/releases/download/v0.3.4/RemoteDeskPRO-Windows.zip",
       "filename": "RemoteDeskPRO-Windows.zip",
-      "sha256": "1ccb0c877f6b7bc9c2647039475ad198e8d85c552f0fd813229c52a9c097f5e2"
+      "sha256": "39ec99c5ef1a3dc1eaa563db04c5a1e85fcc1422b3e1947ea7c93767ac9797d0"
     }
   }
 }
