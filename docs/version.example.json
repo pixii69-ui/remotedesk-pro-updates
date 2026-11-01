@@ -1,0 +1,17 @@
+{
+  "version": "0.4.0",
+  "version_code": 5,
+  "notes": "PRZYKŁAD — pliki i skróty nie są prawdziwe. Nie publikować jako version.json.",
+  "platforms": {
+    "android": {
+      "url": "https://github.com/pixii69-ui/remotedesk-pro-updates/releases/download/v0.4.0/RemoteDeskPRO.apk",
+      "filename": "RemoteDeskPRO.apk",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "windows": {
+      "url": "https://github.com/pixii69-ui/remotedesk-pro-updates/releases/download/v0.4.0/RemoteDeskPRO-Windows.zip",
+      "filename": "RemoteDeskPRO-Windows.zip",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  }
+}
