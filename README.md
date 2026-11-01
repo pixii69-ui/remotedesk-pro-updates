@@ -6,27 +6,28 @@ sekrety pozostają w osobnym, prywatnym repozytorium `pixii69-ui/remotedesk-pro`
 
 ## Status
 
-**Kanał OTA jeszcze nieaktywny**: brak publicznego Release i brak `version.json`.
-To zamierzone; zainstalowana aplikacja 0.3.1+4 nie ma na razie nowszego wydania.
+**Kanał OTA AKTYWNY: v0.3.2+5**, opublikowany 1 listopada 2026.
+Manifest `version.json` na `main` wskazuje zatwierdzone pliki GitHub Release `vX.Y.Z`.
+GitHub Actions `validate public updates` #5 i #6: PASS, w tym pobranie publicznych plików i kontrola SHA-256.
 
 - APK 0.3.1+4 podpisane stałym kluczem: PASS, test instalacji/uruchomienia
   na telefonie: PASS.
 - Docelowy pakiet Android: `pl.remotedesk.remotedesk_pro`.
-- Pierwsza prawdziwa aktualizacja OTA: **minimum 0.3.2+5**.
+- Pierwsza aktualizacja OTA: **0.3.2+5** z podpisanej 0.3.1+4. Test na rzeczywistym telefonie jeszcze niepotwierdzony.
 - Windows sprawdza i pobiera ZIP z SHA-256, ale **nie aktualizuje EXE automatycznie**.
 
-## Proces pierwszego publicznego wydania
+## Proces kolejnych publicznych wydań
 
-1. Przetestować podpisanego kandydata 0.3.2+5 z prywatnego workflow
+1. Przetestować podpisanego kandydata następnego wydania z prywatnego workflow
    `prepare signed candidate (manual)`, Android oraz Windows. Nie usuwać
    istniejącej 0.3.1.
 2. Właściciel osobno zatwierdza publiczną publikację obydwu paczek.
-3. Utworzyć w tym repozytorium **publiczny Release** z tagiem `v0.3.2` i
+3. Utworzyć w tym repozytorium **publiczny Release** z tagiem `vX.Y.Z` i
    dokładnie dwoma plikami:
    `RemoteDeskPRO.apk` oraz `RemoteDeskPRO-Windows.zip`.
 4. Po sprawdzeniu Release właściciel uruchamia **ręcznie** workflow
    `RemoteDesk PRO — activate owner-approved OTA (manual)`,
-   podając `version=0.3.2`, `version_code=5`, notatki wydania
+   podając kolejne numery wersji i kodu kompilacji, notatki wydania
    i wybierając `I_APPROVE_PUBLIC_OTA`.
 5. Workflow sprawdza opublikowany Release, **stały SHA-256 certyfikatu
    podpisu Androida**, `applicationId`, `versionName`, `versionCode`,
@@ -44,7 +45,7 @@ publikacja plików nie została już zatwierdzona.
 
 `https://raw.githubusercontent.com/pixii69-ui/remotedesk-pro-updates/main/version.json`
 
-Brak tego pliku oznacza, że kanał jest nieaktywny.
+Plik jest aktywny. Weryfikacja na urządzeniu 0.3.1 → 0.3.2 nadal jest do wykonania.
 
 ## Bezpieczeństwo i ograniczenia
 
@@ -59,3 +60,11 @@ Brak tego pliku oznacza, że kanał jest nieaktywny.
 - Nie publikować sekretów, kluczy, źródeł prywatnych ani debug APK.
 
 Pełna lista kontrolna: [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md).
+
+## Aktywacja pierwszego wydania — zapis wykonania
+
+- Publiczny GitHub Release `v0.3.2`: właściciel opublikował dwa podpisane/weryfikowane pliki, status stable.
+- SHA-256 obu assetów potwierdzone przez GitHub Release API i osobno pobrane w GitHub Actions #5.
+- Pierwszy manifest aktywowano zatwierdzonym PR #2 i scalono do `main`; CI #6 po scaleniu również PASS.
+- Nie uruchamiano ręcznego workflow `activate-approved-ota.yml` dla pierwszego wydania; służy do następnych wydawnictw po zatwierdzeniu.
+- **Do weryfikacji**: wykrycie i instalacja OTA na realnym Androidzie, zachowanie danych i test Windows na fizycznym komputerze.
